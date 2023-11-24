@@ -1,0 +1,33 @@
+version: '3.3'
+
+services:
+  redis-single:
+    image: redis:alpine
+    ports:
+      - 6379:6379
+    container_name: redis-single
+    hostname: redis-single
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - ./data-redis:/data
+    networks:
+      - external
+
+  redis-cluster:
+    image: grokzen/redis-cluster:7.0.10
+    container_name: redis-cluster
+    hostname: redis-cluster
+    ports:
+      - 7000-7005:7000-7005
+    environment:
+      IP: '0.0.0.0'
+      SENTINEL: 'false'
+      STANDALONE: 'false'
+    volumes:
+      - ./data-redis-cluster:/redis-data
+    networks:
+      - external
+
+networks:
+  external:
+    name: redis_network

@@ -1,0 +1,10 @@
+apps:
+  - script: ./dist/index.js
+    name: 'exchange-price-service'
+    watch: false
+    instances: 2
+    exec_mode: cluster
+    env:
+      NODE_ENV: production
+    env_production:
+      NODE_ENV: production

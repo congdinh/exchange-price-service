@@ -1,0 +1,91 @@
+version: '3.8'
+services:
+  redis-single:
+    image: redis:7-alpine
+    container_name: redis-single
+    hostname: redis-single
+    restart: unless-stopped
+    ports:
+      - 6379:6379
+    volumes:
+      - redis-single:/data
+
+  redis-cluster:
+    image: grokzen/redis-cluster:7.0.10
+    container_name: redis-cluster
+    hostname: redis-cluster
+    ports:
+      - 7000-7005:7000-7005
+    environment:
+      IP: '0.0.0.0'
+      SENTINEL: 'false'
+      STANDALONE: 'false'
+    volumes:
+      - redis-cluster:/redis-data
+
+  exchange-price-service:
+    build:
+      context: .
+    image: exchange-price-service:latest
+    container_name: exchange-price-service
+    restart: unless-stopped
+    ports:
+      - $PORT:$PORT
+    env_file:
+      - ./.env
+    command: /bin/sh -c "pm2-runtime start pm2/start.yml"
+    depends_on:
+      - redis-single
+      - redis-cluster
+
+  exchange-price-stream:
+    image: exchange-price-service:latest
+    container_name: exchange-price-stream
+    restart: unless-stopped
+    environment:
+      - PORT=9003
+    env_file:
+      - ./.env.local
+    command: /bin/sh -c "pm2-runtime start pm2/worker.yml"
+    depends_on:
+      - redis-single
+      - redis-cluster
+      - exchange-price-service
+
+volumes:
+  redis-single:
+    driver: local
+  redis-cluster:
+    driver: local
+
+  # exchange-price-service:
+  #   build:
+  #     context: .
+  #     dockerfile: ./Dockerfile.local
+  #   image: exchange-price-service:local
+  #   container_name: exchange-price-service
+  #   restart: unless-stopped
+  #   command: /bin/sh -c "pm2-runtime start pm2/start.yml"
+  #   ports:
+  #     - $PORT:$PORT
+  #   env_file:
+  #     - ./.env.local
+  #   volumes:
+  #     - ./:/app
+  #   depends_on:
+  #     - redis-single
+  #     - redis-cluster
+
+  # trading-price-stream:
+  #   image: exchange-price-service:local
+  #   container_name: exchange-price-stream
+  #   restart: unless-stopped
+  #   command: /bin/sh -c "pm2-runtime start pm2/schedule.yml"
+  #   env_file:
+  #     - ./.env.local
+  #   volumes:
+  #     - ./:/app
+  #   depends_on:
+  #     - redis-single
+  #     - redis-cluster
+  #     - exchange-price-service
