@@ -57,35 +57,3 @@ volumes:
     driver: local
   redis-cluster:
     driver: local
-
-  # exchange-price-service:
-  #   build:
-  #     context: .
-  #     dockerfile: ./Dockerfile.local
-  #   image: exchange-price-service:local
-  #   container_name: exchange-price-service
-  #   restart: unless-stopped
-  #   command: /bin/sh -c "pm2-runtime start pm2/start.yml"
-  #   ports:
-  #     - $PORT:$PORT
-  #   env_file:
-  #     - ./.env.local
-  #   volumes:
-  #     - ./:/app
-  #   depends_on:
-  #     - redis-single
-  #     - redis-cluster
-
-  # trading-price-stream:
-  #   image: exchange-price-service:local
-  #   container_name: exchange-price-stream
-  #   restart: unless-stopped
-  #   command: /bin/sh -c "pm2-runtime start pm2/schedule.yml"
-  #   env_file:
-  #     - ./.env.local
-  #   volumes:
-  #     - ./:/app
-  #   depends_on:
-  #     - redis-single
-  #     - redis-cluster
-  #     - exchange-price-service
