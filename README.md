@@ -7,9 +7,8 @@
 [![Downloads Stats][npm-downloads]][npm-url]
 [![MIT License][license-shield]][license-url]
 
-One to two paragraph statement about your product and what it does.
 
-![](https://github.com/othneildrew/Best-README-Template/raw/master/images/logo.png)
+![](./demo.png)
 
 <!-- GETTING STARTED -->
 
